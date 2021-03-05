@@ -5,6 +5,7 @@ package org.bondlib;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 
 /**
@@ -183,6 +184,11 @@ public final class CompactBinaryWriter implements TwoPassProtocolWriter {
     }
 
     @Override
+    public void writeBytes(byte[] value, int offset, int length) throws IOException {
+        this.writer.writeBytes(value, offset, length);
+    }
+
+    @Override
     public void writeBool(final boolean value) throws IOException {
         this.writer.writeInt8((byte) (value ? 1 : 0));
     }
@@ -208,6 +214,28 @@ public final class CompactBinaryWriter implements TwoPassProtocolWriter {
             final byte[] bytes = StringHelper.encodeWString(value);
             writer.writeVarUInt32(bytes.length / 2);
             writer.writeBytes(bytes);
+        }
+    }
+
+    @Override
+    public void writeBlobString(Blob value) throws IOException {
+        if (value.size() == 0) {
+            this.writer.writeVarUInt32(0);
+        } else {
+            writer.writeVarUInt32(value.size());
+            writeBlobContent(value);
+        }
+    }
+
+    public void writeBlobContent(Blob value) throws IOException {
+        int bytesRemaining = value.size();
+        for (ByteBuffer buffer : value.getByteBuffers()) {
+            int len = Math.min(bytesRemaining, buffer.limit() - buffer.position());
+            writer.writeBytes(buffer.array(), buffer.position(), len);
+            bytesRemaining -= len;
+            if (bytesRemaining == 0) {
+                break;
+            }
         }
     }
 
@@ -353,6 +381,11 @@ public final class CompactBinaryWriter implements TwoPassProtocolWriter {
         }
 
         @Override
+        public void writeBytes(byte[] value, int offset, int length) throws IOException {
+            this.addBytes(length);
+        }
+
+        @Override
         public void writeBool(final boolean value) throws IOException {
             this.addBytes(1);
         }
@@ -372,6 +405,22 @@ public final class CompactBinaryWriter implements TwoPassProtocolWriter {
             this.addBytes(VarUIntHelper.getVarUInt32Length(length));
             if (length > 0) {
                 this.addBytes(StringHelper.getEncodedWStringLength(value));
+            }
+        }
+
+        @Override
+        public void writeBlobString(Blob value) throws IOException {
+            final int length = value.size();
+            this.addBytes(VarUIntHelper.getVarUInt32Length(length));
+            if (length > 0) {
+                this.addBytes(length);
+            }
+        }
+
+        public void writeBlobContent(Blob value) throws IOException {
+            final int length = value.size();
+            if (length > 0) {
+                this.addBytes(length);
             }
         }
 

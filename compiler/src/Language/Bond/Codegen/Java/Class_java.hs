@@ -495,14 +495,15 @@ javaNativeSerializationGlue declName = [lt|
 
     @Override
     public void writeExternal(java.io.ObjectOutput out) throws java.io.IOException {
-        final java.io.ByteArrayOutputStream outStream = new java.io.ByteArrayOutputStream();
+        final org.bondlib.ByteArrayOutputStream outStream = org.bondlib.ByteArrayOutputStreamBroker.allocate();
         final org.bondlib.ProtocolWriter writer = new org.bondlib.CompactBinaryWriter(outStream, 1);
         org.bondlib.Marshal.marshal(this, writer);
 
-        final byte[] marshalled = outStream.toByteArray();
         out.write(0);   // This type is not generic and has zero type parameters.
-        out.writeInt(marshalled.length);
-        out.write(marshalled);
+        out.writeInt(outStream.size());
+        outStream.writeTo(out);
+
+        org.bondlib.ByteArrayOutputStreamBroker.deallocate(outStream);
     }
 
     @Override

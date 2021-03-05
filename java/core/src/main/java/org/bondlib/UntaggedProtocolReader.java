@@ -187,6 +187,8 @@ public interface UntaggedProtocolReader {
      */
     String readWString() throws IOException;
 
+    Blob readBlobString() throws IOException;
+
     /**
      * Skip a wstring.
      */

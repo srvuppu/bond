@@ -4,7 +4,7 @@
 package org.bondlib;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 /**
@@ -79,14 +79,28 @@ public final class BlobBondType extends BondType<Blob> {
 
     @Override
     protected final Blob cloneValue(Blob value) {
-        return new Blob(Arrays.copyOf(value.getData(), value.getData().length));
+        return value.clone();
     }
 
     @Override
     protected final void serializeValue(SerializationContext context, Blob value) throws IOException {
         this.verifyNonNullableValueIsNotSetToNull(value);
-        context.writer.writeContainerBegin(value.getData().length, BondDataType.BT_INT8);
-        context.writer.writeBytes(value.getData());
+        context.writer.writeContainerBegin(value.size(), BondDataType.BT_INT8);
+
+        ByteBuffer[] byteBuffers = value.getByteBuffers();
+        int bytesRemaining = value.size();
+
+        for (int i = 0; i < byteBuffers.length && bytesRemaining > 0; i++) {
+            ByteBuffer buffer = byteBuffers[i];
+            if (buffer.hasArray()) {
+                byte[] array = buffer.array();
+                int arrayOffset = buffer.position();
+                int length = Math.min(bytesRemaining, buffer.limit() - buffer.position());
+                context.writer.writeBytes(array, arrayOffset, length);
+                bytesRemaining -= length;
+            }
+        }
+
         context.writer.writeContainerEnd();
     }
 
@@ -122,7 +136,7 @@ public final class BlobBondType extends BondType<Blob> {
             Blob value,
             StructBondType.StructField<Blob> field) throws IOException {
         this.verifySerializedNonNullableFieldIsNotSetToNull(value, field);
-        if (value.getData().length == 0 && field.isOptional()) {
+        if (value.size() == 0 && field.isOptional()) {
             context.writer.writeFieldOmitted(BondDataType.BT_LIST, field.getId(), field.getFieldDef().metadata);
         } else {
             context.writer.writeFieldBegin(BondDataType.BT_LIST, field.getId(), field.getFieldDef().metadata);

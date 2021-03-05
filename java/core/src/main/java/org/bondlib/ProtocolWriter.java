@@ -3,9 +3,6 @@
 
 package org.bondlib;
 
-import org.bondlib.BondDataType;
-import org.bondlib.Metadata;
-
 import java.io.IOException;
 
 /**
@@ -170,6 +167,8 @@ public interface ProtocolWriter {
      */
     void writeBytes(byte[] value) throws IOException;
 
+    void writeBytes(byte[] value, int offset, int length) throws IOException;
+
     /**
      * Write a bool.
      *
@@ -190,4 +189,6 @@ public interface ProtocolWriter {
      * @param value the value
      */
     void writeWString(String value) throws IOException;
+
+    void writeBlobString(Blob value) throws IOException;
 }

@@ -197,6 +197,8 @@ public interface TaggedProtocolReader {
      */
     String readWString() throws IOException;
 
+    Blob readBlobString() throws IOException;
+
     /**
      * Skip a value of specified type.
      *

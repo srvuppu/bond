@@ -8,12 +8,13 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.bondlib:bond-gradle:+'
+        classpath 'org.bondlib:bond-gradle:8.0.0-SNAPSHOT'
     }
 }
 
 plugins {
     id 'com.palantir.git-version' version '0.9.1'
+    id "net.linguica.maven-settings" version "0.5"
 }
 
 apply plugin: 'java'
@@ -22,15 +23,27 @@ apply plugin: 'maven-publish'
 apply plugin: 'org.bondlib.gradle'
 
 group 'org.bondlib'
-version gitVersion(prefix:'java@')
+version '8.0.0-SNAPSHOT'
 
-sourceCompatibility = 1.6
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://msazure.pkgs.visualstudio.com/_packaging/Bond%40Local/maven/v1'
+        name 'Bond@Local'
+        authentication {
+            basic(BasicAuthentication)
+        }
+    }
 }
 
 dependencies {
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
+    implementation group: 'com.github.chrisvest', name: 'stormpot', version: '2.4.2'
+    implementation group: 'com.google.guava', name: 'guava', version: '30.1-jre'
+
     testCompile 'junit:junit:4.12'
 }
 
@@ -38,10 +51,10 @@ publishing {
     repositories {
         maven {
             url 'https://msazure.pkgs.visualstudio.com/_packaging/Bond/maven/v1'
-                credentials {
-                    username "VSTS"
-                    password project.hasProperty('vstsMavenAccessToken') ? "${vstsMavenAccessToken}" : ''
-                }
+            credentials {
+                username "VSTS"
+                password project.hasProperty('vstsMavenAccessToken') ? "${vstsMavenAccessToken}" : ''
+            }
         }
     }
 
@@ -60,7 +73,7 @@ compileTestJava {
 
 compileBond {
     bondfiles '../../idl/bond/core/bond.bond',
-              '../../idl/bond/core/bond_const.bond'
+            '../../idl/bond/core/bond_const.bond'
     options '-n', 'bond=org.bondlib'
 }
 

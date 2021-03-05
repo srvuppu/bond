@@ -195,6 +195,17 @@ public final class SimpleBinaryReader implements UntaggedProtocolReader {
     }
 
     @Override
+    public Blob readBlobString() throws IOException {
+        int size = this.readLength();
+        if (size == 0) {
+            return new Blob();
+        }
+
+        byte[] content = this.reader.readBytes(size);
+        return new Blob(content);
+    }
+
+    @Override
     public void skipWString() throws IOException {
         final int codeUnitCount = readLength();
         this.reader.skipBytes(codeUnitCount * 2);

@@ -44,8 +44,14 @@ final class StreamHelper {
      * @throws IOException  if other I/O error occurred
      */
     static void readBytes(InputStream inputStream, byte[] buffer, int offset, int length) throws IOException {
-        if (inputStream.read(buffer, offset, length) < length) {
-            throw new EOFException();
+        int totalBytesRead = 0;
+        while (totalBytesRead != length) {
+            //This is required as inputStream.read can return bytes less than length.
+            int bytesRead = inputStream.read(buffer, offset + totalBytesRead, length - totalBytesRead);
+            if (bytesRead == -1) {
+                throw new EOFException();
+            }
+            totalBytesRead += bytesRead;
         }
     }
 

@@ -5,6 +5,7 @@ package org.bondlib;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 
 /**
  * Implements Simple Binary serialization.
@@ -191,6 +192,11 @@ public final class SimpleBinaryWriter implements ProtocolWriter {
     }
 
     @Override
+    public void writeBytes(byte[] value, int offset, int length) throws IOException {
+        this.writer.writeBytes(value, offset, length);
+    }
+
+    @Override
     public void writeBool(final boolean value) throws IOException {
         this.writer.writeBool(value);
     }
@@ -216,6 +222,28 @@ public final class SimpleBinaryWriter implements ProtocolWriter {
             final byte[] bytes = StringHelper.encodeWString(value);
             writeLength(bytes.length / 2);
             this.writer.writeBytes(bytes);
+        }
+    }
+
+    @Override
+    public void writeBlobString(Blob value) throws IOException {
+        if (value.size() == 0) {
+            writeLength(0);
+        } else {
+            writeLength(value.size());
+            writeBlobContent(value);
+        }
+    }
+
+    public void writeBlobContent(Blob value) throws IOException {
+        int bytesRemaining = value.size();
+        for (ByteBuffer buffer : value.getByteBuffers()) {
+            int len = Math.min(bytesRemaining, buffer.limit() - buffer.position());
+            writer.writeBytes(buffer.array(), buffer.position(), len);
+            bytesRemaining -= len;
+            if (bytesRemaining == 0) {
+                break;
+            }
         }
     }
 

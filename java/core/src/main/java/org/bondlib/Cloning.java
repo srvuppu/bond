@@ -1,9 +1,6 @@
 package org.bondlib;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -106,6 +103,8 @@ final class Cloning {
             return clone((ByteBufferInputStream) stream);
         } else if (stream instanceof ByteArrayInputStream) {
             return clone((ByteArrayInputStream) stream);
+        } else if (stream instanceof ByteArrayOutputStream.SequenceInputStreamEx) {
+            return ((ByteArrayOutputStream.SequenceInputStreamEx)stream).cloneStream();
         } else {
             throw new StreamNotCloneableException("Stream is not cloneable: " + stream);
         }

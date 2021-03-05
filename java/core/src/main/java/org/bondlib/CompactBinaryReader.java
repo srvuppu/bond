@@ -183,6 +183,17 @@ public final class CompactBinaryReader implements TaggedProtocolReader {
     }
 
     @Override
+    public Blob readBlobString() throws IOException {
+        int size = this.reader.readVarUInt32();
+        if (size == 0) {
+            return new Blob();
+        }
+
+        byte[] content = this.reader.readBytes(size);
+        return new Blob(content);
+    }
+
+    @Override
     public void skip(final BondDataType type) throws IOException {
         switch (type.value) {
             // 1-byte

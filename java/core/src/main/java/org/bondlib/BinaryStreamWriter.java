@@ -60,6 +60,10 @@ final class BinaryStreamWriter {
         this.outputStream.write(value);
     }
 
+    void writeBytes(byte[] value, int offset, int length) throws IOException {
+        this.outputStream.write(value, offset, length);
+    }
+
     void writeVarUInt16(short value) throws IOException {
         VarUIntHelper.encodeVarUInt16(value, this.outputStream);
     }

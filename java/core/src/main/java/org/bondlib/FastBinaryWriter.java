@@ -155,6 +155,11 @@ public final class FastBinaryWriter implements ProtocolWriter {
     }
 
     @Override
+    public void writeBytes(byte[] value, int offset, int length) throws IOException {
+
+    }
+
+    @Override
     public void writeBool(final boolean value) throws IOException {
         writer.writeBool(value);
     }
@@ -181,5 +186,10 @@ public final class FastBinaryWriter implements ProtocolWriter {
             writer.writeVarUInt32(bytes.length / 2);
             writer.writeBytes(bytes);
         }
+    }
+
+    @Override
+    public void writeBlobString(Blob value) throws IOException {
+        throw new UnsupportedOperationException("writeBlobString is not implemented in FastBinaryWriter");
     }
 }
