@@ -10,7 +10,7 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 group 'org.bondlib'
-version '8.0.0-SNAPSHOT'
+version gitVersion(prefix:'java@')
 
 dependencies {
     compile localGroovy()

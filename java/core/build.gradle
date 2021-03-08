@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.bondlib:bond-gradle:8.0.0-SNAPSHOT'
+        classpath 'org.bondlib:bond-gradle:+'
     }
 }
 
