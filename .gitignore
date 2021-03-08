@@ -17,3 +17,5 @@
 .vscode/
 
 .idea/
+build/
+compiler/dist-newstyle
