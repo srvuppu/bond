@@ -11,17 +11,26 @@ tag versions. The Bond compiler (`gbc`) and
 different versioning scheme, following the Haskell community's
 [package versioning policy](https://wiki.haskell.org/Package_versioning_policy).
 
-## Unreleased ##
+## 9.0.5: 2021-04-14 ##
 
-* IDL core version: TBD
-* C++ version: TBD (bug fix bump needed)
-* C# NuGet version: TBD
-* `gbc` & compiler library: TBD
+* IDL core version: 3.0
+* C++ version: 9.0.5
+* C# NuGet version: 9.0.5
+* `gbc` & compiler library: 0.12.1.0
 
 ### C++/Python ###
 
+* Added CMake variable `BOND_FIND_GRPC` to allow for external gRPC
+  installations. The search for external GRPC installations is only done
+  when `BOND_ENABLE_GRPC` is `TRUE`.
 * Removed use of deprecated `std::ptr_fun` in the Python library. ([Issue
   \#1080](https://github.com/microsoft/bond/issues/1080))
+
+### C# ###
+
+* Implicit codegen now excludes any .bond files in the project's output
+  directories (e.g., `bin/`, `obj/debug/netstandard1.0`). This behavior
+  matches the implicit compilation behavior for .cs files.
 
 ## 9.0.4: 2020-11-23 ##
 
